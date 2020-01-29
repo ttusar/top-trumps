@@ -136,6 +136,8 @@ int main(int argc, char** argv) {
     testPlayerLevel();
     std::cout << "----------------------------------------" <<std::endl;
     testRankRemains();
+    (void) argc; /* To avoid the unused warning */
+    (void) argv; /* To avoid the unused warning */
     return (EXIT_SUCCESS);
 }
 

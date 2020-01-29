@@ -191,6 +191,7 @@ int HVCalculator::isPile(const double* cub, const double regLow[], const double 
 		
 	// region in only one dimenison not completly covered 
 	// ==> cuboid is a pile 
+  (void) regUp; /* To avoid the unused warning */
 	return pile;
 }
 double HVCalculator::computeTrellis(const double regLow[], const double regUp[], const double trellis[]) {

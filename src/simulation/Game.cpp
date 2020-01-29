@@ -103,5 +103,6 @@ int Game::round(int won_last, std::vector<std::vector<Card>> cards, int verbose)
     }else if(verbose>=1){
         std::cout << "Winner: " << winner << std::endl;
     }
+    (void) cards; /* To avoid the unused warning */
     return winner; 
 }

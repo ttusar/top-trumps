@@ -119,6 +119,8 @@ int main(int argc, char** argv) {
     testRandomisation();
     std::cout << "----------------------------------------" <<std::endl;
     testRankUpdates();
+    (void) argc; /* To avoid the unused warning */
+    (void) argv; /* To avoid the unused warning */
     return (EXIT_SUCCESS);
 }
 

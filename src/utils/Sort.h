@@ -59,7 +59,7 @@ void sort(
     index_cmp<std::vector<T>& >(unsorted));
 
   sorted.resize(unsorted.size());
-  reorder(unsorted,index_map,sorted);
+  reorder<double>(unsorted,index_map,sorted);
 }
 
 // This implementation is O(n), but also uses O(n) extra memory
@@ -73,7 +73,7 @@ void reorder(
   // sorted
   std::vector<T> copy = unordered;
   ordered.resize(index_map.size());
-  for(int i = 0; i<index_map.size();i++)
+  for(size_t i = 0; i<index_map.size();i++)
   {
     ordered[i] = copy[index_map[i]];
   }

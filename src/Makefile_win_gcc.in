@@ -7,7 +7,7 @@ else
 endif
 
 CXXFLAGS := -std=c++11
-WFLAGS := -Wall -Wpedantic
+WFLAGS := -Wall -Wpedantic -Wextra
 LDFLAGS += '-Wl,-rpath,$$ORIGIN' -L. -l$(LNAME)
 
 srcfiles := utils/Hoy.cpp simulation/Card.cpp simulation/Deck.cpp simulation/Agent.cpp simulation/Game.cpp simulation/Outcome.cpp
