@@ -1,0 +1,9 @@
+Hoy.o: utils/Hoy.cpp utils/Hoy.h
+Card.o: simulation/Card.cpp simulation/Card.h
+Deck.o: simulation/Deck.cpp simulation/Deck.h simulation/Card.h \
+ simulation/../utils/hoy.h simulation/../utils/sort.h
+Agent.o: simulation/Agent.cpp simulation/Agent.h simulation/Card.h \
+ simulation/Deck.h
+Game.o: simulation/Game.cpp simulation/Game.h simulation/Deck.h \
+ simulation/Card.h simulation/Agent.h simulation/Outcome.h
+Outcome.o: simulation/Outcome.cpp simulation/Outcome.h
