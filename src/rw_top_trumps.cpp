@@ -44,7 +44,7 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
     min_vector[i] = min[i];
     max_vector[i] = max[i];
     for (size_t j = 0; j < n; j++) {
-      x_vector[j * m + i] = x[j * m + 1];
+      x_vector[j * m + i] = x[j * m + i];
       if (x_vector[j * m + i] < min_vector[i] || x_vector[j * m + i] > max_vector[i]) {
         fprintf(stderr, "Out of bounds for instance %lu, ", instance);
         fprintf(stderr, "i = %lu, ", j * m + i);
