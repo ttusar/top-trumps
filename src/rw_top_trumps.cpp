@@ -179,10 +179,6 @@ void rw_top_trumps_bounds(size_t instance, size_t mm, double *min, double *max) 
   }
 }
 
-void rw_top_trumps_test(void) {
-  cout << "Top trumps is working!\n";
-}
-
 #ifdef __cplusplus
 }
 #endif

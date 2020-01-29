@@ -12,8 +12,6 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives, size_
 
 void rw_top_trumps_bounds(size_t instance, size_t m, double *min, double *max);
 
-void rw_top_trumps_test(void);
-
 #ifdef __cplusplus
 }
 #endif
