@@ -6,30 +6,32 @@
 #include "rw_top_trumps.h"
 #include "simulation/Game.h"
 
+using namespace std;
+
 #define LARGE_VALUE 1e10-1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int m = 4;
+size_t m = 4;
 int rep = 2000;
 int players = 2;
 
 /**
  * The evaluator for problems from the rw_top_trumps suite
  */
-void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives, size_t function,
-    size_t instance, size_t dimension, const double *x, double *y)
-{
-  int seed = (int) instance;
+void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
+    size_t function, size_t instance, size_t dimension, const double *x,
+    double *y) {
+  unsigned int seed = (unsigned int) instance;
   srand(seed);
-  int n = (int) dimension / m;
-  std::vector<double> y_vector(number_of_objectives);
-  std::vector<double> x_vector(x, x + dimension);
-  bool outOfBounds=false;
-  std::vector<double> min_vector(m);
-  std::vector<double> max_vector(m);
+  size_t n = dimension / m;
+  vector<double> y_vector(number_of_objectives);
+  vector<double> x_vector(dimension);
+  bool outOfBounds = false;
+  vector<double> min_vector(m);
+  vector<double> max_vector(m);
   double maxHyp = 1;
   double maxSD = 50;
 
@@ -38,79 +40,92 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives, size_
   rw_top_trumps_bounds(instance, m, min, max);
 
   // Check if out of bounds
-  for(int i=0; i<m; i++){
+  for (size_t i = 0; i < m; i++) {
     min_vector[i] = min[i];
     max_vector[i] = max[i];
-    for(int j=0; j<n; j++){
-        if(x_vector[j*m+i] <min_vector[i] || x_vector[j*m+i] > max_vector[i]){
-            fprintf(stderr, "Out of bounds for instance %lu, ", instance);
-            fprintf(stderr, "i = %d, ", j*m+i);
-            fprintf(stderr, "x[%d] = %f, min[%d] = %f, max[%d] = %f\n",
-                j*m+i, x_vector[j*m+i], i, min_vector[i], i, max_vector[i]);
-            outOfBounds=true;
-            break;
-        }
+    for (size_t j = 0; j < n; j++) {
+      x_vector[j * m + i] = x[j * m + 1];
+      if (x_vector[j * m + i] < min_vector[i] || x_vector[j * m + i] > max_vector[i]) {
+        fprintf(stderr, "Out of bounds for instance %lu, ", instance);
+        fprintf(stderr, "i = %lu, ", j * m + i);
+        fprintf(stderr, "x[%lu] = %f, min[%lu] = %f, max[%lu] = %f\n",
+            j * m + i, x_vector[j * m + i], i, min_vector[i], i, max_vector[i]);
+        outOfBounds = true;
+        break;
+      }
     }
   }
+  free(min);
+  free(max);
   // If out of bounds, return a large value
-  if(outOfBounds){
+  if (outOfBounds) {
     for (size_t i = 0; i < number_of_objectives; i++)
-        y[i] = LARGE_VALUE;
+      y[i] = LARGE_VALUE;
     return;
   }
 
-  Deck deck(x_vector, n, m, min_vector, max_vector);
-  if ((strcmp(suite_name, "rw-top-trumps") == 0) && (number_of_objectives == 1) && (function <=2)) {
+  Deck deck(x_vector, (int) n, (int) m, min_vector, max_vector);
+  if ((strcmp(suite_name, "rw-top-trumps") == 0) && (number_of_objectives == 1)
+      && (function <= 2)) {
     if (function == 1) {
-      y_vector[0] = -deck.getHV()/maxHyp;
+      y_vector[0] = -deck.getHV() / maxHyp;
     } else if (function == 2) {
-      y_vector[0] = -deck.getSD()/maxSD;
+      y_vector[0] = -deck.getSD() / maxSD;
     }
-  } else if ((strcmp(suite_name, "rw-top-trumps-biobj") == 0) && (number_of_objectives == 2) && (function<=1)) {
+  } else if ((strcmp(suite_name, "rw-top-trumps-biobj") == 0)
+      && (number_of_objectives == 2) && (function <= 1)) {
     if (function == 1) {
-      y_vector[0] = -deck.getHV()/maxHyp;
-      y_vector[1] = -deck.getSD()/maxSD;
-    } 
-  } else{
-		std::vector<Agent> agents(players);
-    std::vector<int> playerLevel1(4, 0);
+      y_vector[0] = -deck.getHV() / maxHyp;
+      y_vector[1] = -deck.getSD() / maxSD;
+    }
+  } else {
+    vector<Agent> agents((size_t) players);
+    vector<int> playerLevel1(4, 0);
     agents[0] = Agent(playerLevel1, deck);
-    std::vector<int> playerLevel2(4, 1);
+    vector<int> playerLevel2(4, 1);
     agents[1] = Agent(playerLevel2, deck);
 
-    Game game(deck, players, agents, seed);
+    Game game(deck, players, agents, (int) seed);
     Outcome out(rep);
     for (int i = 0; i < rep; i++) {
       out = game.run(out, 0);
     }
-	
-		if ((strcmp(suite_name, "rw-top-trumps") == 0) && (number_of_objectives == 1)) {
-		  if (function == 3) {
-		    y_vector[0] = -out.getFairAgg();
-		  } else if (function == 4) {
-		    y_vector[0] = -players * out.getLeadChangeAgg()/n;
-		  } else if (function == 5) {
-		    y_vector[0] = out.getTrickDiffAgg()-1;
-		  } else {
-				fprintf(stderr, "evaluate(): suite %s does not have function %lu", suite_name, function);
-				exit(EXIT_FAILURE);
-		  }
-		} else if ((strcmp(suite_name, "rw-top-trumps-biobj") == 0) && (number_of_objectives == 2)) {
-			if (function == 2) {
-			  y_vector[0] = -out.getFairAgg();
-			  y_vector[1] = -players * out.getLeadChangeAgg()/n;
-			} else if (function == 3) {
-			  y_vector[0] = -out.getFairAgg();
-			  y_vector[1] = out.getTrickDiffAgg()-1;
-	 		} else {
-				fprintf(stderr, "evaluate(): suite %s does not have function %lu", suite_name, function);
-				exit(EXIT_FAILURE);
-	  	}
-		} else {
-		  fprintf(stderr, "evaluate(): suite %s cannot have %lu objectives", suite_name, number_of_objectives);
-		  exit(EXIT_FAILURE);
-		}
-	}
+
+    if ((strcmp(suite_name, "rw-top-trumps") == 0)
+        && (number_of_objectives == 1)) {
+      if (function == 3) {
+        y_vector[0] = -out.getFairAgg();
+      } else if (function == 4) {
+        y_vector[0] = -players * out.getLeadChangeAgg() / n;
+      } else if (function == 5) {
+        y_vector[0] = out.getTrickDiffAgg() - 1;
+      } else {
+        fprintf(stderr,
+            "evaluate_rw_top_trumps(): suite %s does not have function %lu",
+            suite_name, function);
+        exit(EXIT_FAILURE);
+      }
+    } else if ((strcmp(suite_name, "rw-top-trumps-biobj") == 0)
+        && (number_of_objectives == 2)) {
+      if (function == 2) {
+        y_vector[0] = -out.getFairAgg();
+        y_vector[1] = -players * out.getLeadChangeAgg() / n;
+      } else if (function == 3) {
+        y_vector[0] = -out.getFairAgg();
+        y_vector[1] = out.getTrickDiffAgg() - 1;
+      } else {
+        fprintf(stderr,
+            "evaluate_rw_top_trumps(): suite %s does not have function %lu",
+            suite_name, function);
+        exit(EXIT_FAILURE);
+      }
+    } else {
+      fprintf(stderr,
+          "evaluate_rw_top_trumps(): suite %s cannot have %lu objectives",
+          suite_name, number_of_objectives);
+      exit(EXIT_FAILURE);
+    }
+  }
   for (size_t i = 0; i < number_of_objectives; i++)
     y[i] = y_vector[i];
 }
@@ -118,7 +133,7 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives, size_
 /**
  * Bounds are defined based on instance in a deterministic way.
  */
-void rw_top_trumps_bounds(size_t instance, int m, double *min, double *max) {
+void rw_top_trumps_bounds(size_t instance, size_t mm, double *min, double *max) {
 
   double l[15][4] = {
       { 39,  78,  20,  34},
@@ -155,19 +170,18 @@ void rw_top_trumps_bounds(size_t instance, int m, double *min, double *max) {
       { 67,  52,  98,  39}
   };
 
-  assert(m == 4);
+  assert(mm == 4);
   assert(instance <= 15);
-  for(size_t i = 0; i < m; i++){
+  for (size_t i = 0; i < mm; i++) {
     min[i] = l[instance - 1][i];
     max[i] = u[instance - 1][i];
-    //std::cout << "lower " << l[i] << ", upper " << u[i] << std::endl;
+    //cout << "lower " << l[i] << ", upper " << u[i] << endl;
   }
 }
 
 void rw_top_trumps_test(void) {
-  std::cout << "Top trumps is working!\n";
+  cout << "Top trumps is working!\n";
 }
-
 
 #ifdef __cplusplus
 }
