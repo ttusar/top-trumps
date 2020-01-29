@@ -9,97 +9,72 @@
 #include <fstream>
 #include <iostream>
 #include "simulation/Game.h"
+#include "rw_top_trumps.h"
 
 using namespace std;
 
-void printOutput(std::vector<double> value, int obj){
-    ofstream file;
-    file.open("objectives.txt");
-    file << obj;
-    for(int i=0; i<obj; i++){
-        file << "\n" << value[i];
-    }
-    file.close();
-}
-
-
 /*
- * Input: Seed, objectiveIndicator, rep
+ * Prints the value of the middle of the domain for the given problem.
+ *
+ * Requires arguments: number_of_objectives, function, instance, dimension
  */
 int main(int argc, char** argv) {
-    int seed = atof(argv[1]);
-    int obj = atof(argv[2]);
-    int rep = atof(argv[3]);
-    int d = 0;
-    
-    
-    int m = 4;
-    int players = 2;
 
-    double readNumber;
-    std::ifstream file("variables.txt");
-    file >> readNumber;
-    int inputDimension = (int)readNumber;
-    std::vector<double>values(inputDimension);
-    
-
-    for(int i=0; i<inputDimension; i++){
-        file >> readNumber;
-        values[i] = readNumber;
-    }
-    file.close();
-    
-    int n = (int) inputDimension/m;
-    if(obj>=6){
-        d =2;
-    }else{
-        d=1;
-    }
-    
-    std::vector<double>result(n);
-    
-    std::vector<double> min(m, 0);
-    std::vector<double> max(m,100);
-    Deck deck(values, n, m, min, max);
-    if(obj==1){
-        result[0] = -deck.getHV();
-    }else if(obj==2){
-        result[0] = -deck.getSD();
-    }else if(obj==6){
-        result[0] = -deck.getHV();
-        result[1] = -deck.getSD();
-    }else{
-        std::vector<Agent>agents(players);
-        std::vector<int>playerLevel1(4,0);
-        agents[0] = Agent(playerLevel1, deck);
-        std::vector<int>playerLevel2(4,1);
-        agents[1] = Agent(playerLevel2, deck);
-
-
-        Game game(deck, players, agents, seed);
-        Outcome out(rep);
-        for(int i=0; i<rep; i++){
-            out = game.run(out,0);
-        }
-        
-        if(obj==3){
-            result[0] = -out.getFairAgg();
-        }else if(obj==4){
-            result[0] = -out.getLeadChangeAgg();
-        }else if(obj==5){
-            result[0] = out.getTrickDiffAgg();
-        }else if(obj==7){
-            result[0] = -out.getFairAgg();
-            result[1] = -out.getLeadChangeAgg();
-        }else if(obj==8){
-            result[0] = out.getTrickDiffAgg();
-            result[1] = -out.getLeadChangeAgg();
-        }
-    }
-    
-    printOutput(result, d);
+  if (argc != 5) {
+    cout << "Incorrect arguments, expected usage:" << endl;
+    cout << "TopTrumpsExec number_of_objectives function instance dimension";
+    cout << endl;
+    cout << "For example:" << endl;
+    cout << "./TopTrumpsExec 1 1 1 88" << endl;
     return 0;
+  }
+
+  size_t num_objectives = (size_t) atoi(argv[1]);
+  size_t function = (size_t) atoi(argv[2]);
+  size_t instance = (size_t) atoi(argv[3]);
+  size_t dimension = (size_t) atoi(argv[4]);
+  size_t m = 4;
+
+  double *min { new double[m] { } };
+  double *max { new double[m] { } };
+  double *x { new double[dimension] { } };
+  double *y { new double[num_objectives] { } };
+
+  rw_top_trumps_bounds(instance, m, min, max);
+
+  // Set x to be the middle of the domain
+  for (size_t i = 0; i < dimension; i++) {
+    x[i] = int((max[i % m] + min[i % m]) / 2);
+  }
+
+  char *suite_name;
+  if (num_objectives == 1)
+    suite_name = (char *) "rw-top-trumps";
+  else if (num_objectives == 2)
+    suite_name = (char *) "rw-top-trumps-biobj";
+  else {
+    cerr << "Incorrect number of objectives (" << num_objectives
+        << ") supported 1 or 2" << endl;
+    return -1;
+  }
+
+  evaluate_rw_top_trumps(suite_name, num_objectives, function, instance,
+      dimension, x, y);
+
+  cout << "x = ";
+  for (size_t i = 0; i < dimension; i++) {
+    cout << x[i] << " ";
+  }
+  cout << endl << "y = ";
+  for (size_t i = 0; i < num_objectives; i++) {
+    cout << y[i] << " ";
+  }
+  cout << endl;
+
+  delete[] min;
+  delete[] max;
+  delete[] x;
+  delete[] y;
+  return 0;
 }
-
-
 
