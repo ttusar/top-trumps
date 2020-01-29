@@ -51,7 +51,7 @@ int main(void) {
     printf("%.0f ", x[i]);
   printf("\n");
   
-  for (function = 1; function <= 7; function++) {
+  for (function = 1; function <= 5; function++) {
     perform_one_test("rw-top-trumps", number_of_objectives, function, instance, dimension, x);
   }
   free(x);
