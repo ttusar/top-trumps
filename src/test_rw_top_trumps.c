@@ -2,111 +2,62 @@
 
 #include "rw_top_trumps.h"
 
+void perform_one_test(char *suite_name, size_t number_of_objectives, size_t function,
+    size_t instance, size_t dimension, const double *x) {
+
+  size_t i;
+  double *y;
+  y = (double *) malloc(dimension * sizeof(double));
+
+  evaluate_rw_top_trumps(suite_name, number_of_objectives, function, instance, dimension, x, y);
+
+  printf("function = %lu\ny = ", function);
+  for (i = 0; i < number_of_objectives; i++)
+    printf("%.4f\n", y[i]);
+  printf("\n");
+  fflush(stdout);
+  free(y);
+}
+
 int main(void) {
 
-  size_t function = 1;
+  size_t function;
   size_t instance = 3;
-  size_t size_x = 88;
-  size_t size_y = 1;
-  size_t i;
+  size_t dimension = 88;
+  size_t number_of_objectives = 1;
+  size_t i, m = 4;
   double *x;
-  double *y;
-  double * lb;
-  double * ub;
+  double *lb;
+  double *ub;
 
-  rw_top_trumps_test();
+  x = (double *) malloc(dimension * sizeof(double));
+  lb = (double *) malloc(m * sizeof(double));
+  ub = (double *) malloc(m * sizeof(double));
+  rw_top_trumps_bounds(instance, m, lb, ub);
+  /* Set x to be the middle of the domain */
+  for (i = 0; i < dimension; i++) {
+    if (i < 3)
+      printf("%lu lb = %f ub = %f\n", i, ub[i], lb[i]);
+    x[i] = (ub[i % m] + lb[i % m]) / 2;
+  }
+  free(lb);
+  free(ub);
 
-  x = (double *) malloc(size_x * sizeof(double));
-  y = (double *) malloc(size_y * sizeof(double));
-
-  for (i = 0; i < size_x; i++)
-    x[i] = 12;
-
-  evaluate_rw_top_trumps("rw-top-trumps", size_y, function, instance, size_x, x, y);
-
-  printf("function = %lu, instance = %lu, objectives = %lu\n",
-      (unsigned long)function, (unsigned long)instance, (unsigned long)size_y);
+  printf("instance = %lu, objectives = %lu\n",
+      (unsigned long) instance,
+      (unsigned long) number_of_objectives);
   printf("x = ");
-  for (i = 0; i < size_x; i++)
-    printf("%.0f\t", x[i]);
+  for (i = 0; i < dimension; i++)
+    printf("%.0f ", x[i]);
   printf("\n");
-  printf("y = ");
-  for (i = 0; i < size_y; i++)
-    printf("%.4f\n", y[i]);
-  printf("\n");
-  fflush(stdout);
-
-  function=2;
-  evaluate_rw_top_trumps("rw-top-trumps", size_y, function, instance, size_x, x, y);
-
-  printf("function = %lu, instance = %lu, objectives = %lu\n",
-      (unsigned long)function, (unsigned long)instance, (unsigned long)size_y);
-  printf("y = ");
-  for (i = 0; i < size_y; i++)
-    printf("%.4f\n", y[i]);
-  printf("\n");
-  fflush(stdout);
-
-  function=3;
-  evaluate_rw_top_trumps("rw-top-trumps", size_y, function, instance, size_x, x, y);
-
-  printf("function = %lu, instance = %lu, objectives = %lu\n",
-      (unsigned long)function, (unsigned long)instance, (unsigned long)size_y);
-  printf("y = ");
-  for (i = 0; i < size_y; i++)
-    printf("%.4f\n", y[i]);
-  printf("\n");
-  fflush(stdout);
-
-  function=4;
-  evaluate_rw_top_trumps("rw-top-trumps", size_y, function, instance, size_x, x, y);
-
-  printf("function = %lu, instance = %lu, objectives = %lu\n",
-      (unsigned long)function, (unsigned long)instance, (unsigned long)size_y);
-  printf("y = ");
-  for (i = 0; i < size_y; i++)
-    printf("%.4f\n", y[i]);
-  printf("\n");
-  fflush(stdout);
-
-  function=5;
-  evaluate_rw_top_trumps("rw-top-trumps", size_y, function, instance, size_x, x, y);
-
-  printf("function = %lu, instance = %lu, objectives = %lu\n",
-      (unsigned long)function, (unsigned long)instance, (unsigned long)size_y);
-  printf("y = ");
-  for (i = 0; i < size_y; i++)
-    printf("%.4f\n", y[i]);
-  printf("\n");
-  fflush(stdout);
-
-  free(y);
-
-  function = 6;
-  size_y = 2;
-  y = (double *) malloc(size_y * sizeof(double));
   
-
-  lb = (double *) malloc(size_x* sizeof(double));
-  ub= (double *) malloc(size_x* sizeof(double));
-  rw_top_trumps_bounds(instance, size_x, lb, ub);
-  
-  evaluate_rw_top_trumps("rw-top-trumps", size_y, function, instance, size_x, x, y);
-
-  printf("function = %lu, instance = %lu, objectives = %lu\n",
-      (unsigned long)function, (unsigned long)instance, (unsigned long)size_y);
-  printf("x = ");
-  for (i = 0; i < size_x; i++)
-    printf("%.0f\t", x[i]);
-  printf("\n");
-  printf("y = ");
-  for (i = 0; i < size_y; i++)
-    printf("%.4f\n", y[i]);
-  printf("\n");
-  fflush(stdout);
-
+  for (function = 1; function <= 7; function++) {
+    perform_one_test("rw-top-trumps", number_of_objectives, function, instance, dimension, x);
+  }
   free(x);
-  free(y);
+  
+  printf("Done!\n");
+  fflush(stdout);
 
   return 0;
 }
