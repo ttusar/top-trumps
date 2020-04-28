@@ -57,7 +57,6 @@ void Deck::computeRanks(){
 
 }
 
-
 void Deck::shuffle(){
     std::random_shuffle(&cards[0], &cards[n]);
 }
@@ -93,9 +92,9 @@ int Deck::getN(){
 
 
 double Deck::getHV(){
-    std::vector<double> refPoint(this->m, std::numeric_limits<double>::min());
+    std::vector<double> refPoint(this->m, this->max);
     std::vector<double>values(this->n*this->m);
-    int counter =0;
+    /*int counter =0;
     for(int i =0; i<this->n; i++){
         Card card = this->cards[i];
         for(int j=0; j<this->m; j++){
@@ -105,7 +104,7 @@ double Deck::getHV(){
             }
             counter++;
         }
-    }
+    }*/
     for(int i=0; i<this->m; i++){
         refPoint[i]+=1;
     }
