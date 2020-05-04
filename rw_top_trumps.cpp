@@ -98,9 +98,7 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
   if ((strcmp(suite_name, "rw-top-trumps") == 0) && (number_of_objectives == 1)
       && (function <= 2)) {
     if (function == 1) {
-      cout << "test"  << maxHyp << endl;
       y_vector[0] = -deck.getHV() / maxHyp;
-      cout << "test"  << maxHyp << endl;
     } else if (function == 2) {
       y_vector[0] = -deck.getSD() / maxSD;
     }
@@ -207,7 +205,7 @@ void rw_top_trumps_bounds(size_t instance, size_t mm, double *min, double *max) 
   for (size_t i = 0; i < mm; i++) {
     min[i] = l[instance - 1][i];
     max[i] = u[instance - 1][i];
-    cout << "lower " << l[i] << ", upper " << u[i] << endl;
+    //cout << "lower " << l[i] << ", upper " << u[i] << endl;
   }
 }
 
