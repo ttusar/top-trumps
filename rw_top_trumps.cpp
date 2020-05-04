@@ -62,14 +62,9 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
   free(max);
 
 
-  std::vector<double> refPoint = max_vector;
   for(std::size_t i=0; i<m; i++){
-    refPoint[i]+=1;
+    maxHyp *= max_vector[i] +1 - min_vector[i];
   }
-  HVCalculator hv2;
-
-  //int dimension, int dataNumber, double* points, double* refPoint
-  maxHyp = hv2.computeHV(m, 1, min_vector, refPoint);
 
   vector<double> mean_vector(m);
   double mean=0;

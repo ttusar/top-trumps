@@ -107,7 +107,7 @@ double Deck::getHV(){
     }
     HVCalculator hv;
     //int dimension, int dataNumber, double* points, double* refPoint
-    return hv.computeHV(this->m, this->n, values, refPoint);
+    return hv.computeHV(this->m, this->n, values, refPoint);;
 }
 
 double Deck::getSD(){
