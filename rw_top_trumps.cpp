@@ -98,15 +98,15 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
   if ((strcmp(suite_name, "rw-top-trumps") == 0) && (number_of_objectives == 1)
       && (function <= 2)) {
     if (function == 1) {
-      y_vector[0] = -deck.getHV() / maxHyp;
+      y_vector[0] = -deck.getHV() / maxHyp +1;
     } else if (function == 2) {
-      y_vector[0] = -deck.getSD() / maxSD;
+      y_vector[0] = -deck.getSD() / maxSD +1;
     }
   } else if ((strcmp(suite_name, "rw-top-trumps-biobj") == 0)
       && (number_of_objectives == 2) && (function <= 1)) {
     if (function == 1) {
-      y_vector[0] = -deck.getHV() / maxHyp;
-      y_vector[1] = -deck.getSD() / maxSD;
+      y_vector[0] = -deck.getHV() / maxHyp +1;
+      y_vector[1] = -deck.getSD() / maxSD +1;
     }
   } else {
     vector<Agent> agents((size_t) players);
@@ -124,11 +124,11 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
     if ((strcmp(suite_name, "rw-top-trumps") == 0)
         && (number_of_objectives == 1)) {
       if (function == 3) {
-        y_vector[0] = -out.getFairAgg();
+        y_vector[0] = -out.getFairAgg() +1;
       } else if (function == 4) {
-        y_vector[0] = -players * out.getLeadChangeAgg() / n;
+        y_vector[0] = -players * out.getLeadChangeAgg() / n +1;
       } else if (function == 5) {
-        y_vector[0] = out.getTrickDiffAgg()/n -1;
+        y_vector[0] = out.getTrickDiffAgg()/n;
       } else {
         fprintf(stderr,
             "evaluate_rw_top_trumps(): suite %s does not have function %lu",
@@ -138,11 +138,11 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
     } else if ((strcmp(suite_name, "rw-top-trumps-biobj") == 0)
         && (number_of_objectives == 2)) {
       if (function == 2) {
-        y_vector[0] = -out.getFairAgg();
-        y_vector[1] = -players * out.getLeadChangeAgg() / n;
+        y_vector[0] = -out.getFairAgg() +1;
+        y_vector[1] = -players * out.getLeadChangeAgg() / n +1;
       } else if (function == 3) {
-        y_vector[0] = -out.getFairAgg();
-        y_vector[1] = out.getTrickDiffAgg()/n - 1;
+        y_vector[0] = -out.getFairAgg()+1;
+        y_vector[1] = out.getTrickDiffAgg()/n;
       } else {
         fprintf(stderr,
             "evaluate_rw_top_trumps(): suite %s does not have function %lu",
