@@ -5,6 +5,8 @@
 #include <string.h>
 #include "rw_top_trumps.h"
 #include "simulation/Game.h"
+#include "utils/Hoy.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -33,7 +35,7 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
   vector<double> min_vector(m);
   vector<double> max_vector(m);
   double maxHyp = 1;
-  double maxSD = 50;
+  double maxSD = 0;
 
   double *min = (double *) malloc(m * sizeof(double));
   double *max = (double *) malloc(m * sizeof(double));
@@ -55,8 +57,35 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
       }
     }
   }
+
   free(min);
   free(max);
+
+
+  for(std::size_t i=0; i<m; i++){
+    maxHyp *= max_vector[i] +1 - min_vector[i];
+  }
+
+  vector<double> mean_vector(m);
+  double mean=0;
+  for(std::size_t i=0; i<m; i++){
+    if(i%2==0){
+      mean_vector[i] = *std::min_element(min_vector.begin(), min_vector.end());    
+    }else{
+      mean_vector[i] = *std::max_element(max_vector.begin(), max_vector.end());
+    }
+    mean += mean_vector[i];
+  }
+
+
+  mean/=m;
+  for(std::size_t i=0; i<m; i++){
+      maxSD+=(mean_vector[i] - mean)*(mean_vector[i] -mean);
+  }
+
+  maxSD/=(m-1);
+  maxSD = std::sqrt(maxSD);
+
   // If out of bounds, return a large value
   if (outOfBounds) {
     for (size_t i = 0; i < number_of_objectives; i++)
@@ -65,6 +94,7 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
   }
 
   Deck deck(x_vector, (int) n, (int) m, min_vector, max_vector);
+
   if ((strcmp(suite_name, "rw-top-trumps") == 0) && (number_of_objectives == 1)
       && (function <= 2)) {
     if (function == 1) {
@@ -98,7 +128,7 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
       } else if (function == 4) {
         y_vector[0] = -players * out.getLeadChangeAgg() / n;
       } else if (function == 5) {
-        y_vector[0] = out.getTrickDiffAgg() - 1;
+        y_vector[0] = out.getTrickDiffAgg()/n -1;
       } else {
         fprintf(stderr,
             "evaluate_rw_top_trumps(): suite %s does not have function %lu",
@@ -112,7 +142,7 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
         y_vector[1] = -players * out.getLeadChangeAgg() / n;
       } else if (function == 3) {
         y_vector[0] = -out.getFairAgg();
-        y_vector[1] = out.getTrickDiffAgg() - 1;
+        y_vector[1] = out.getTrickDiffAgg()/n - 1;
       } else {
         fprintf(stderr,
             "evaluate_rw_top_trumps(): suite %s does not have function %lu",

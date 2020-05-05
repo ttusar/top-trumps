@@ -92,25 +92,22 @@ int Deck::getN(){
 
 
 double Deck::getHV(){
-    std::vector<double> refPoint(this->m, this->max);
+    std::vector<double> refPoint = this->max;
     std::vector<double>values(this->n*this->m);
-    /*int counter =0;
+    int counter =0;
     for(int i =0; i<this->n; i++){
         Card card = this->cards[i];
         for(int j=0; j<this->m; j++){
             values[counter] = card.getValue(j);
-            if(refPoint[j]<values[counter]){
-                refPoint[j]= values[counter];
-            }
             counter++;
         }
-    }*/
+    }
     for(int i=0; i<this->m; i++){
         refPoint[i]+=1;
     }
     HVCalculator hv;
     //int dimension, int dataNumber, double* points, double* refPoint
-    return hv.computeHV(this->m, this->n, values, refPoint);
+    return hv.computeHV(this->m, this->n, values, refPoint);;
 }
 
 double Deck::getSD(){
