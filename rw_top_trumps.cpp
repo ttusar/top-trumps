@@ -98,14 +98,14 @@ void evaluate_rw_top_trumps(char *suite_name, size_t number_of_objectives,
   if ((strcmp(suite_name, "rw-top-trumps") == 0) && (number_of_objectives == 1)
       && (function <= 2)) {
     if (function == 1) {
-      y_vector[0] = -deck.getHV() / maxHyp +1;
+      y_vector[0] = -deck.getHV2() / maxHyp +1;
     } else if (function == 2) {
       y_vector[0] = -deck.getSD() / maxSD +1;
     }
   } else if ((strcmp(suite_name, "rw-top-trumps-biobj") == 0)
       && (number_of_objectives == 2) && (function <= 1)) {
     if (function == 1) {
-      y_vector[0] = -deck.getHV() / maxHyp +1;
+      y_vector[0] = -deck.getHV2() / maxHyp +1;
       y_vector[1] = -deck.getSD() / maxSD +1;
     }
   } else {
