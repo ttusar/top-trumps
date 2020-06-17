@@ -14,6 +14,7 @@
 #include "../simulation/Deck.h"
 #include "../simulation/Card.h"
 #include "../utils/Hoy.h"
+#include "../utils/Hoy2.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -119,13 +120,34 @@ void testHV(){
     for(int i=0; i<n*m; i++){
         values[i] = i;
     }
+    std::vector<std::vector<double>> values2;
+    for(int i = 0; i < n; i++){
+        std::vector<double> v(m);
+        for(int j = 0; j < m; j++){
+          v[j] = values[j + m*i];
+        }
+        values2.push_back(v);
+    }
+    for(int i=0; i<n*m; i++){
+      std::cout << values[i] << " ";
+    }
+    std::cout << std::endl;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+          std::cout << values2[i][j] << " ";
+        }
+    }
     std::vector<double> refPoint ={37, 38, 39, 40};
     HVCalculator hv;
+    Hoy hv2;
+    std::cout << std::endl;
     std::cout << "Hypervolume: " << hv.computeHV(m,n,values,refPoint) << std::endl;
+    std::cout << "Hypervolume2: " << hv2.compute(values2,refPoint) << std::endl;
     std::vector<double> min(m, 0);
     std::vector<double> max(m,100);
     Deck deck(values, n, m, min, max);
     std::cout << "Hypervolume: " << deck.getHV() << std::endl;
+    std::cout << "Hypervolume2: " << deck.getHV2() << std::endl;
 }
 
 void testSD(){
