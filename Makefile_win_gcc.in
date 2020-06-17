@@ -6,11 +6,11 @@ else
     LIBNAME := lib$(LNAME).so
 endif
 
-CXXFLAGS := -std=c++11
+CXXFLAGS := -std=c++11 -g
 WFLAGS := -Wall -Wpedantic -Wextra
 LDFLAGS += '-Wl,-rpath,$$ORIGIN' -L. -l$(LNAME)
 
-srcfiles := utils/Hoy.cpp simulation/Card.cpp simulation/Deck.cpp simulation/Agent.cpp simulation/Game.cpp simulation/Outcome.cpp
+srcfiles := utils/Hoy.cpp utils/Hoy2.cpp simulation/Card.cpp simulation/Deck.cpp simulation/Agent.cpp simulation/Game.cpp simulation/Outcome.cpp
 objects  := $(patsubst %.cpp, %.o, $(srcfiles))
 mainfiles:= main.cpp tests/DeckTest.cpp tests/AgentTest.cpp tests/GameTest.cpp
 mains  := $(patsubst %.cpp, %.o, $(mainfiles))

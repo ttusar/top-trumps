@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include "../utils/Hoy.h"
+#include "../utils/Hoy2.h"
 #include "../utils/Sort.h"
 
 Deck::Deck(){
@@ -90,7 +91,7 @@ int Deck::getN(){
     return this->n;
 }
 
-
+/* Hypervolume computation using the code from Hoy.cpp */
 double Deck::getHV(){
     std::vector<double> refPoint = this->max;
     std::vector<double>values(this->n*this->m);
@@ -108,6 +109,25 @@ double Deck::getHV(){
     HVCalculator hv;
     //int dimension, int dataNumber, double* points, double* refPoint
     return hv.computeHV(this->m, this->n, values, refPoint);;
+}
+
+/* Hypervolume computation using the code from Hoy2.cpp */
+double Deck::getHV2(){
+    std::vector<double>refPoint = this->max;
+    std::vector<std::vector<double>> values;
+    for(int i =0; i<this->n; i++){
+        Card card = this->cards[i];
+        std::vector<double> v(this->m);
+        for(int j=0; j<this->m; j++){
+          v[j] = card.getValue(j);
+        }
+        values.push_back(v);
+    }
+    for(int i=0; i<this->m; i++){
+        refPoint[i]+=1;
+    }
+    Hoy hv;
+    return hv.compute(values, refPoint);;
 }
 
 double Deck::getSD(){

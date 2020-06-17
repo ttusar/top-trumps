@@ -23,34 +23,28 @@
  *****************************************************************************/
 
 
-#include "hoy.h"
-#include "base.h"
+#include "Hoy2.h"
 #include <algorithm>
 #include <bitset>
 #include <cmath>
 #include <limits>
-#include <boost/numeric/conversion/cast.hpp>
 
-namespace pagmo { namespace util { namespace hv_algorithm {
+Hoy::Hoy() { }
 
-/// Constructor
-hoy::hoy() { }
-
-/// Compute hypervolume
 /**
  * @param[in] points vector of points containing the D-dimensional points for which we compute the hypervolume
  * @param[in] r_point reference point for the points
  *
  * @return hypervolume.
  */
-double hoy::compute(std::vector<fitness_vector> &points, const fitness_vector &r_point) const
+double Hoy::compute(std::vector<std::vector<double>> points, std::vector<double> refPoint) const
 {
-  m_dimension = r_point.size();
+  m_dimension = refPoint.size();
   m_total_size = points.size();
-  m_sqrt_size = sqrt(boost::numeric_cast<double>(m_total_size));
+  m_sqrt_size = sqrt((double)m_total_size);
   m_volume = 0.0;
 
-  sort(points.begin(), points.end(), fitness_vector_cmp(m_dimension - 1, '<'));
+  sort(points.begin(), points.end(), fitness_vector_cmp(m_dimension - 1));
 
   m_region_low = new double[m_dimension - 1];
   m_region_up = new double[m_dimension - 1];
@@ -61,14 +55,13 @@ double hoy::compute(std::vector<fitness_vector> &points, const fitness_vector &r
 
   // initialize the D-1 dimensional region vectors and D-dimensional reference point
   for (int i = 0 ; i < m_dimension - 1 ; ++i) {
-    m_region_up[i] = r_point[i];
+    m_region_up[i] = refPoint[i];
     m_region_low[i] = std::numeric_limits<double>::max();
   }
 
   double** initial_points = new double*[m_total_size];
   for (int n = 0 ; n < m_total_size ; ++n) {
     initial_points[n] = new double[m_dimension];
-
     initial_points[n][m_dimension - 1] = points[n][m_dimension - 1];
     for (int i = 0 ; i < m_dimension - 1 ; ++i) {
       initial_points[n][i] = points[n][i];
@@ -79,7 +72,7 @@ double hoy::compute(std::vector<fitness_vector> &points, const fitness_vector &r
   }
 
   // call stream initially
-  stream(m_region_low, m_region_up, initial_points, m_total_size, 0, r_point[m_dimension - 1], 0);
+  stream(m_region_low, m_region_up, initial_points, m_total_size, 0, refPoint[m_dimension - 1], 0);
 
   // free the memory for child node points
   for (unsigned int n = 0; n < m_child_points.size() ; ++n) {
@@ -104,7 +97,7 @@ double hoy::compute(std::vector<fitness_vector> &points, const fitness_vector &r
   return m_volume;
 }
 
-bool hoy::covers(const double cub[], const double reg_low[]) const
+bool Hoy::covers(const double cub[], const double reg_low[]) const
 {
   for (int i = 0; i < m_dimension - 1; ++i) {
     if (cub[i] > reg_low[i]) {
@@ -114,7 +107,7 @@ bool hoy::covers(const double cub[], const double reg_low[]) const
   return true;
 }
 
-bool hoy::part_covers(const double cub[], const double reg_up[]) const
+bool Hoy::part_covers(const double cub[], const double reg_up[]) const
 {
   for (int i = 0; i < m_dimension - 1; ++i) {
     if (cub[i] >= reg_up[i]) {
@@ -124,7 +117,7 @@ bool hoy::part_covers(const double cub[], const double reg_up[]) const
   return true;
 }
 
-int hoy::contains_boundary(const double cub[], const double reg_low[], const int split) const
+int Hoy::contains_boundary(const double cub[], const double reg_low[], const int split) const
 {
   // condition only checked for split > 0
   if (reg_low[split] >= cub[split]){
@@ -144,7 +137,7 @@ int hoy::contains_boundary(const double cub[], const double reg_low[], const int
   return 0;
 }
 
-double hoy::get_measure(const double reg_low[], const double reg_up[]) const
+double Hoy::get_measure(const double reg_low[], const double reg_up[]) const
 {
   double vol = 1.0;
   for (int i = 0 ; i < m_dimension - 1 ; ++i) {
@@ -153,7 +146,7 @@ double hoy::get_measure(const double reg_low[], const double reg_up[]) const
   return vol;
 }
 
-int hoy::is_pile(const double cub[], const double reg_low[]) const
+int Hoy::is_pile(const double cub[], const double reg_low[]) const
 {
 
   int pile = m_dimension;
@@ -178,7 +171,7 @@ int hoy::is_pile(const double cub[], const double reg_low[]) const
   return pile;
 }
 
-double hoy::compute_trellis(const double reg_low[], const double reg_up[], const double trellis[]) const
+double Hoy::compute_trellis(const double reg_low[], const double reg_up[], const double trellis[]) const
 {
 
   double total = 1.0; // total area region
@@ -191,7 +184,7 @@ double hoy::compute_trellis(const double reg_low[], const double reg_up[], const
   return total - empty;
 }
 
-double hoy::get_median(double* bounds, unsigned int n) const
+double Hoy::get_median(double* bounds, unsigned int n) const
 {
   if (n < 3) {
     return bounds[n - 1];
@@ -202,7 +195,7 @@ double hoy::get_median(double* bounds, unsigned int n) const
 }
 
 /// Recursive calculation of the hypervolume.
-void hoy::stream(double m_region_low[], double m_region_up[], double** points, const unsigned int n_points, int split, double cover, unsigned int rec_level) const
+void Hoy::stream(double m_region_low[], double m_region_up[], double** points, const unsigned int n_points, int split, double cover, unsigned int rec_level) const
 {
   double cover_old = cover;
   unsigned int cover_index = 0;
@@ -351,32 +344,7 @@ void hoy::stream(double m_region_low[], double m_region_up[], double** points, c
   }
 }
 
-/// Verify before compute method
-/**
- * Verifies whether given algorithm suits the requested data.
- *
- * @param[in] points vector of points containing the D-dimensional points for which we compute the hypervolume
- * @param[in] r_point reference point for the vector of points
- *
- * @throws value_error when trying to compute the hypervolume for the non-maximal reference point
- */
-void hoy::verify_before_compute(const std::vector<fitness_vector> &points, const fitness_vector &r_point) const
+fitness_vector_cmp::fitness_vector_cmp(int dim)
 {
-  base::assert_minimisation(points, r_point);
+  m_cmp_obj = new cmp_fun(dim);
 }
-
-/// Clone method.
-base_ptr hoy::clone() const
-{
-  return base_ptr(new hoy(*this));
-}
-
-/// Algorithm name
-std::string hoy::get_name() const
-{
-  return "HOY algorithm";
-}
-
-} } }
-
-BOOST_CLASS_EXPORT_IMPLEMENT(pagmo::util::hv_algorithm::hoy)

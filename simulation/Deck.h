@@ -34,6 +34,7 @@ public:
     std::vector<double> getMax();
     
     double getHV();
+    double getHV2();
     double getSD();
     void computeRanks();
     
