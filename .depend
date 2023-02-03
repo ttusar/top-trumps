@@ -1,9 +1,18 @@
 Hoy.o: utils/Hoy.cpp utils/Hoy.h
-Card.o: simulation/Card.cpp simulation/Card.h
-Deck.o: simulation/Deck.cpp simulation/Deck.h simulation/Card.h \
- simulation/../utils/hoy.h simulation/../utils/sort.h
-Agent.o: simulation/Agent.cpp simulation/Agent.h simulation/Card.h \
- simulation/Deck.h
-Game.o: simulation/Game.cpp simulation/Game.h simulation/Deck.h \
- simulation/Card.h simulation/Agent.h simulation/Outcome.h
-Outcome.o: simulation/Outcome.cpp simulation/Outcome.h
+Hoy2.o: utils/Hoy2.cpp utils/Hoy2.h
+Card.o: simulation/Card.cpp simulation/../simulation/Card.h
+Deck.o: simulation/Deck.cpp simulation/../simulation/Deck.h \
+ simulation/../simulation/../simulation/Card.h simulation/../utils/Hoy.h \
+ simulation/../utils/Hoy2.h simulation/../utils/Sort.h
+Agent.o: simulation/Agent.cpp simulation/../simulation/Agent.h \
+ simulation/../simulation/../simulation/Card.h \
+ simulation/../simulation/../simulation/Deck.h \
+ /cygdrive/d/Delo/Github/top-trumps/simulation/Card.h
+Game.o: simulation/Game.cpp simulation/../simulation/Game.h \
+ simulation/../simulation/../simulation/Agent.h \
+ /cygdrive/d/Delo/Github/top-trumps/simulation/Card.h \
+ /cygdrive/d/Delo/Github/top-trumps/simulation/Deck.h \
+ /cygdrive/d/Delo/Github/top-trumps/simulation/Card.h \
+ simulation/../simulation/../simulation/Deck.h \
+ simulation/../simulation/../simulation/Outcome.h
+Outcome.o: simulation/Outcome.cpp simulation/../simulation/Outcome.h
